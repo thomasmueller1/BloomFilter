@@ -83,7 +83,7 @@ public class BloomFilter {
         System.out.println("Amount of not existing words: " + notExistingWords.size());
         System.out.println("Amount of trues: " + amountOfTrue);
         System.out.println("Amount of words in both: " + amountOfWordsInBothInputs);
-        System.out.println(amountOfTrue + " - " + amountOfWordsInBothInputs + "/" + notExistingWords.size() * 0.01 + " = " + (amountOfTrue - amountOfWordsInBothInputs) / (notExistingWords.size()* 0.01) + "%");
+        System.out.println("(" + amountOfTrue + " - " + amountOfWordsInBothInputs + ")" + "/" + notExistingWords.size() * 0.01 + " = " + (amountOfTrue - amountOfWordsInBothInputs) / (notExistingWords.size() * 0.01) + "%");
     }
 
     public static void main(String[] args) {
