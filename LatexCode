@@ -20,7 +20,7 @@ Wenn an einer dieser Positionen eine 0 steht, ist das Wort definitiv nicht im Fi
 \subsection{Nachteile}
 \begin{itemize}
 \item Je kleiner das Bitarray ist, desto grösser ist die Wahrscheinlichkeit, dass ein Wort als enthalten merkiert wird, obwohl es nicht im Filter hinzugefügt wurde.
-
+\item Der Filter kann nur aussagen, ob ein Wort sicher nicht oder ob es vielleicht enthalten ist.
 \end{itemize}
 
 \section{Praxisbeispiel}
