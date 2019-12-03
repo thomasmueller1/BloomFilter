@@ -1,5 +1,5 @@
 # BloomFilter
-BloomFilter for Module Dist an der FHNW
+BloomFilter for Module dist an der FHNW
 
 ## Klasse
 - 5iCbb
