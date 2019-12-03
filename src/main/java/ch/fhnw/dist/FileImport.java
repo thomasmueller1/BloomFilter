@@ -5,17 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileImport {
 
-    public ArrayList<String> readFileContentToList(String file, Boolean SelectDistinct) throws IOException {
+    public List<String> readFileContentToList(String file, Boolean SelectDistinct) throws IOException {
         ArrayList<String> lst = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String strLine;
             while ((strLine = br.readLine()) != null) {
                 String[] wordSplitted = strLine.split(" ");
-                Arrays.asList(wordSplitted).stream().filter(s -> !s.isEmpty()).forEach(s -> lst.add(s));
+                Arrays.asList(wordSplitted).stream().filter(s -> !s.isEmpty()).forEach(s -> lst.add(s.trim()));
             }
         }
         if (SelectDistinct) {
