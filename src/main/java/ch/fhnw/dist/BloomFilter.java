@@ -13,6 +13,7 @@ public class BloomFilter {
 
     BitSet hashes;
     int n, k, m;
+    List<HashFunction> hashFunctions;
 
     // p = Fehlerwahrscheinlichkeit
     public BloomFilter(double p) {
@@ -33,7 +34,7 @@ public class BloomFilter {
         hashes = new BitSet((int) m + 1);
 
 
-        List<HashFunction> hashFunctions = getHashfunctions(k);
+        hashFunctions = getHashfunctions(k);
         for (HashFunction hashFunction : hashFunctions) {
             for (String word : words) {
                 hashes.set(Math.abs(hashFunction.hashString(word).asInt() % m));
@@ -43,7 +44,7 @@ public class BloomFilter {
 
     }
 
-    private List<HashFunction> getHashfunctions(int k) {
+    private static List<HashFunction> getHashfunctions(int k) {
         List<HashFunction> hashFunctions = new ArrayList<>(k);
         for (int i = 0; i < k; i++) {
             hashFunctions.add(Hashing.murmur3_128(i));
@@ -53,7 +54,6 @@ public class BloomFilter {
 
 
     public boolean contains(String word) {
-        List<HashFunction> hashFunctions = getHashfunctions(k);
         for (HashFunction hashFunction : hashFunctions) {
             int value = Math.abs(hashFunction.hashString(word).asInt() % m);
             if (!hashes.get(value)) return false;
@@ -62,7 +62,7 @@ public class BloomFilter {
     }
 
     public static void main(String[] args) {
-        BloomFilter bloomFilter = new BloomFilter(0.1);
+        BloomFilter bloomFilter = new BloomFilter(0.0023);
         System.out.println(bloomFilter.contains("Thierry"));
         System.out.println(bloomFilter.contains("het"));
         System.out.println(bloomFilter.contains("e"));
