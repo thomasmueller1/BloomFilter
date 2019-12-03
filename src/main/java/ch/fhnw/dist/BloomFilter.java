@@ -17,16 +17,9 @@ public class BloomFilter {
 
     // p = Fehlerwahrscheinlichkeit
     public BloomFilter(double p) {
-        FileImport fileImport = new FileImport();
-        Scanner in = new Scanner(System.in);
-        String path = in.nextLine();
-        List<String> words = null;
-        try {
-            words = fileImport.readFileContentToList(path, true);
-            n = words.size();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String wordsPath = BloomFilter.class.getClassLoader().getResource("words.txt").getPath();
+
+        List<String> words = getWordsFromFile(wordsPath);
 
         m = (int) Math.ceil((n * Math.log(p)) / Math.log(1 / Math.pow(2, Math.log(2)))); // Länge des Bitarrays
         k = (int) Math.round((m / n) * Math.log(2)); // Anzahl Hashfunktionen
@@ -42,6 +35,19 @@ public class BloomFilter {
         }
 
 
+    }
+
+    private List<String> getWordsFromFile(String wordsPath) {
+        FileImport fileImport = new FileImport();
+
+        List<String> words = null;
+        try {
+            words = fileImport.readFileContentToList(wordsPath, true);
+            n = words.size();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return words;
     }
 
     private static List<HashFunction> getHashfunctions(int k) {
@@ -61,13 +67,26 @@ public class BloomFilter {
         return true;
     }
 
+    public void checkMultipleWords() {
+        String notExistingWordsPath = BloomFilter.class.getClassLoader().getResource("notExistingWords.txt").getPath();
+        List<String> words = getWordsFromFile(notExistingWordsPath);
+        int amountOfTrue = 0;
+        for (String word : words) {
+            if (contains(word)) amountOfTrue++;
+        }
+        System.out.println("Amount of not existing words: " + words.size());
+        System.out.println("Amount of trues: " + amountOfTrue);
+        System.out.println(amountOfTrue + "/" + words.size() * 0.01 + " = " + amountOfTrue / (words.size()* 0.01) + "%");
+    }
+
     public static void main(String[] args) {
         BloomFilter bloomFilter = new BloomFilter(0.0023);
-        System.out.println(bloomFilter.contains("Thierry"));
-        System.out.println(bloomFilter.contains("het"));
-        System.out.println(bloomFilter.contains("e"));
-        System.out.println(bloomFilter.contains("fetti"));
-        System.out.println(bloomFilter.contains("wormy"));
-        System.out.println(bloomFilter.contains("Mueter"));
+        bloomFilter.checkMultipleWords();
+        //System.out.println(bloomFilter.contains("Thierry"));
+        //System.out.println(bloomFilter.contains("het"));
+        //System.out.println(bloomFilter.contains("e"));
+        //System.out.println(bloomFilter.contains("fetti"));
+        //System.out.println(bloomFilter.contains("wormy"));
+        //System.out.println(bloomFilter.contains("Mueter"));
     }
 }

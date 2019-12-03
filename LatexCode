@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Bloomfilter}
+\author{Markus Winter, Homas Müller, Thierry Hundt}
+\date{December 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Vor- und Nachteile}
+\subsection{Vorteile}
+\begin{itemize}
+\item Es lässt sich mit 100 prozentiger Sicherheit aussagen ob ein Wort nicht vorkommt. Aus dem zu prüfenden Wort, werden Hashwerte generiert, diese Hashwerte bezeichnen je eine Position im Bitarray.
+Wenn an einer dieser Positionen eine 0 steht, ist das Wort definitiv nicht im Filter vorhanden.
+\item Der Bloomfilter benötigt im Vergleich mit änlichen Algorithmen sehr wenig Speicherplatz.
+\end{itemize}
+
+\subsection{Nachteile}
+\begin{itemize}
+\item Je kleiner das Bitarray ist, desto grösser ist die Wahrscheinlichkeit, dass ein Wort als enthalten merkiert wird, obwohl es nicht im Filter hinzugefügt wurde.
+
+\end{itemize}
+
+\section{Praxisbeispiel}
+
+\section{Testen Fehlerwahrscheinlichkeit}
+
+\end{document}
