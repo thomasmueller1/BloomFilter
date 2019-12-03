@@ -69,24 +69,25 @@ public class BloomFilter {
 
     public void checkMultipleWords() {
         String notExistingWordsPath = BloomFilter.class.getClassLoader().getResource("notExistingWords.txt").getPath();
-        List<String> words = getWordsFromFile(notExistingWordsPath);
+        List<String> notExistingWords = getWordsFromFile(notExistingWordsPath);
+        String existingWordsPath = BloomFilter.class.getClassLoader().getResource("words.txt").getPath();
+        List<String> existingWords = getWordsFromFile(existingWordsPath);
+        int amountOfWordsInBothInputs = 0;
         int amountOfTrue = 0;
-        for (String word : words) {
-            if (contains(word)) amountOfTrue++;
+        for (String word : notExistingWords) {
+            if (contains(word))
+                amountOfTrue++;
+            if (existingWords.contains(word))
+                amountOfWordsInBothInputs++;
         }
-        System.out.println("Amount of not existing words: " + words.size());
+        System.out.println("Amount of not existing words: " + notExistingWords.size());
         System.out.println("Amount of trues: " + amountOfTrue);
-        System.out.println(amountOfTrue + "/" + words.size() * 0.01 + " = " + amountOfTrue / (words.size()* 0.01) + "%");
+        System.out.println("Amount of words in both: " + amountOfWordsInBothInputs);
+        System.out.println(amountOfTrue + " - " + amountOfWordsInBothInputs + "/" + notExistingWords.size() * 0.01 + " = " + (amountOfTrue - amountOfWordsInBothInputs) / (notExistingWords.size()* 0.01) + "%");
     }
 
     public static void main(String[] args) {
         BloomFilter bloomFilter = new BloomFilter(0.0023);
         bloomFilter.checkMultipleWords();
-        //System.out.println(bloomFilter.contains("Thierry"));
-        //System.out.println(bloomFilter.contains("het"));
-        //System.out.println(bloomFilter.contains("e"));
-        //System.out.println(bloomFilter.contains("fetti"));
-        //System.out.println(bloomFilter.contains("wormy"));
-        //System.out.println(bloomFilter.contains("Mueter"));
     }
 }
