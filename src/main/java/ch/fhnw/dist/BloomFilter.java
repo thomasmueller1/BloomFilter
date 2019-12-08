@@ -4,61 +4,95 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 import java.io.IOException;
+import java.util.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
 
+/**
+ * BloomFilter by
+ * Markus Winter
+ * Thierry Hundth
+ * Thomas Müller
+ */
 public class BloomFilter {
+    int n;                            // Anzahl Wörter in Wordlist
+    int k;                            // Anzahl Hashfunktionen
+    int m;                            // Länge des Bitarrays
+    double p;                         // Fehlerwahrscheinlichkeit
+    BitSet hashes;                    // Bitarray
+    List<HashFunction> hashFunctions; // Liste mit Hashfunktionen
 
-    BitSet hashes;
-    int n, k, m;
-    List<HashFunction> hashFunctions;
-
-    // p = Fehlerwahrscheinlichkeit
+    /**
+     * BloomFilter constructor
+     * @param p Fehlerwahrscheinlichkeit
+     */
     public BloomFilter(double p) {
+        this.p = p;
+        /* Wörter von Wortliste einlesen */
         String wordsPath = BloomFilter.class.getClassLoader().getResource("words.txt").getPath();
-
         List<String> words = getWordsFromFile(wordsPath);
 
-        m = (int) Math.ceil((n * Math.log(p)) / Math.log(1 / Math.pow(2, Math.log(2)))); // Länge des Bitarrays
-        k = (int) Math.round((m / n) * Math.log(2)); // Anzahl Hashfunktionen
+        /* Länge von Bitarray berechnen */
+        m = (int) Math.ceil((n * Math.log(p)) / Math.log(1 / Math.pow(2, Math.log(2)))); //
 
+        /* Anzahl Hashfunktionen berechnen */
+        k = (int) Math.round((m / n) * Math.log(2));
+
+        /* Bitarray mit berechneter Länge erstellen */
         hashes = new BitSet((int) m + 1);
 
-
+        /* Hashfunktionen erstellen */
         hashFunctions = getHashfunctions(k);
+
+        /* Bitarray abfüllen */
         for (HashFunction hashFunction : hashFunctions) {
             for (String word : words) {
-                hashes.set(Math.abs(hashFunction.hashString(word).asInt() % m));
+                hashes.set(Math.abs(hashFunction.hashString(word).asInt() % m)); // Modulo Länge Bitarray
             }
         }
-
-
     }
 
+    /**
+     * Gibt eine strukturierte Wortliste zurück vom gegebenen Pfad
+     * @param wordsPath Pfad zu Wortliste
+     * @return
+     */
     private List<String> getWordsFromFile(String wordsPath) {
         FileImport fileImport = new FileImport();
-
         List<String> words = null;
+
         try {
             words = fileImport.readFileContentToList(wordsPath, true);
             n = words.size();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return words;
     }
 
+    /**
+     * Generiert eine gegebene Anzahl unterschiedliche murmur3_128 Hashfunktionen.
+     * Der Seed wird einfach hochgezählt. Somit ist er garantiert einzigartig.
+     * @param k Anzahl Hashfunktionen
+     * @return
+     */
     private static List<HashFunction> getHashfunctions(int k) {
         List<HashFunction> hashFunctions = new ArrayList<>(k);
+
         for (int i = 0; i < k; i++) {
             hashFunctions.add(Hashing.murmur3_128(i));
         }
+
         return hashFunctions;
     }
 
-
+    /**
+     * Prüft ob ein Wort in der BloomFilter-Datenstruktur enthalten ist oder nicht.
+     * Wenn false -> stimmt zu 100%
+     * Wenn true -> stimmt nur mit einer gewissen Wahrscheinlichkeit
+     * @param word Zu prüfendes Wort
+     * @return
+     */
     public boolean contains(String word) {
         for (HashFunction hashFunction : hashFunctions) {
             int value = Math.abs(hashFunction.hashString(word).asInt() % m);
@@ -67,28 +101,37 @@ public class BloomFilter {
         return true;
     }
 
-    public void checkMultipleWords() {
-        String notExistingWordsPath = BloomFilter.class.getClassLoader().getResource("notExistingWords.txt").getPath();
+    /**
+     * Prüft mehrere Wörter ob sie in der BloomFilter-Datenstruktur enthalten sind oder nicht.
+     * Macht Ausgaben von Parametern der überprüften Wörter und des eigentlichen BloomFilters.
+     * @param wordlist Zu prüfende Wortliste
+     */
+    public void checkMultipleWords(String wordlist) {
+        String notExistingWordsPath = BloomFilter.class.getClassLoader().getResource(wordlist).getPath();
         List<String> notExistingWords = getWordsFromFile(notExistingWordsPath);
         int amountOfTrue = 0;
         for (String word : notExistingWords) {
             if (contains(word))
                 amountOfTrue++;
         }
-        double p = amountOfTrue / (notExistingWords.size() * 0.01);
 
-        System.out.println("Amount of not existing words: " + notExistingWords.size());
-        System.out.println("Amount of matches:            " + amountOfTrue);
-        System.out.println("Fehlerwahrscheinlichkeit:     " + new DecimalFormat("#.##").format(p) + "%");
+        double pCalc = amountOfTrue / (notExistingWords.size() * 0.01);
+
+        System.out.println("Non existing words:     " + notExistingWords.size());
+        System.out.println("Matches in BloomFilter: " + amountOfTrue);
+        System.out.println("Calculated Error Rate:  " + new DecimalFormat("#.##").format(pCalc) + "%");
     }
 
+    /**
+     * Starterklasse
+     * @param args
+     */
     public static void main(String[] args) {
-        BloomFilter bloomFilter2 = new BloomFilter(0.05);
-        bloomFilter2.checkMultipleWords();
+        BloomFilter bloomFilter1 = new BloomFilter(0.05);
+        BloomFilter bloomFilter2 = new BloomFilter(0.005);
 
-        System.out.println("-------------------------------------");
-
-        BloomFilter bloomFilter3 = new BloomFilter(0.005);
-        bloomFilter3.checkMultipleWords();
+        bloomFilter1.checkMultipleWords("notExistingWords.txt");
+        System.out.println("------------------------------");
+        bloomFilter2.checkMultipleWords("notExistingWords.txt");
     }
 }
