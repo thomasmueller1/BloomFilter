@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
 
 \title{Bloomfilter}
 \author{Markus Winter, Homas Müller, Thierry Hundt}
@@ -24,7 +26,38 @@ Wenn an einer dieser Positionen eine 0 steht, ist das Wort definitiv nicht im Fi
 \end{itemize}
 
 \section{Praxisbeispiel}
+Beispiel Anwendung des Bloom Filters
+Google Chrome verwendet den Bloom Filter zu prüfen ob eine eingegebene URL “böswillig” ist.
+In einem ersten Schritt werden alle bekannten “bösenartigen” URLs in einer Hashtabelle gespeichert. Jedes mal wenn man an eine neue URL navigiert, wird diese mittels Bloom Filter in dieser Tabelle gesucht. Wenn der Bloom Filter positive retourniert, wird die URL genauer untersucht.
+Der Bloom Filter ist hier sehr gut geeignet, da er wenig Speicher benötigt und sehr schnell arbeitet. Er beschützt sozusagen das Google API für die Prüfung böswilliger Webseiten vor unnötigem Traffic und übertriebenem Arbeitsaufwand.
 
 \section{Testen Fehlerwahrscheinlichkeit}
+\subsection{1. Schritt – Wortliste erstellen}
+Als Grundlage haben wir die 10'000 meist verwendeten Wörter der deutschen Sprache verwendet. Die Wörter mit der Länge 1 und Wörter diejenigen welche einen Punkt enthalten wurden direkt herausgefiltert.
+Als nächstes haben wir diejenigen Wörter herausgefiltert, welche sowohl in der vorgegeben Wortliste als auch in der neu erstellten Wortliste vorkamen (Nur exakte Übereinstimmungen).
+Kurz gesagt, alle Duplikate wurden entfern.
+Am Schluss beinhaltete die neue Wortliste dann 9636 Wörter, welche garantiert nicht in der vorgegebenen Wortliste vorkamen.
+\newline
+\newline
+\includegraphics[width=\textwidth,height=12cm]{first.png}
+\newpage
+\subsection{2. Schritt – Richtig-Positiv-Test}
+Um die Richtig-Positiven Wörter zu testen wurde ganz einfach die vorgegebene Wortliste mit dem BloomFilter getestet. Im BloomFilter eingelesen wurde ebenfalls die vorgegebene Wortliste. Es müsste also jedes einzelne Wort positiv getestet werden. Dies war dann auch so. 58109 von 58109 Wörter wurden positiv getestet.
+\newline
+\newline
+\includegraphics{second.jpg}
+
+\subsection{3. Schritt – Falsch-Positiv-}
+Nun wurde die neu erstellte Wortliste, welche ausschliesslich Wörter enthält, welche in der vorgegeben Liste garantiert nicht vorkommen, getestet. Würde der Filter auch bei nicht enthaltenen Wörter zu 100% funktioniert, hätte kein einziges Wort erkannt werden sollen. Dies war aber nicht so, was soweit auch korrekt ist. Wie man auf nachfolgendem Screenshot sehen kann, korreliert die dem BloomFilter übergebene Fehlerwahrscheinlichkeit sehr gut mit der experimentell berechneten. Die Abweichungen bewegen sich zwischen 0 und ca. 3%.
+Für übergebene Fehlerwahrscheinlichkeiten unter 0.0001 (0.01%) arbeitet unser Filter mit 9636 Wörtern vollständig korrekt und es werden 0 Falsch-Positive Wörter erkannt. Dies würde allerdings mit steigender Anzahl zu testenden Wörter nicht mehr stimmen.
+\newline
+\newline
+\includegraphics[height=8cm]{third.jpg}
+
+\subsection{Fazit}
+Je nach Anwendung des Filters, kann eine sinnvolle Fehlerwahrscheinlichkeit übergeben werden. Wenn die Berechnung des neuen Wertes bei einem Falsch-Positiven Resultat sehr schnell geht, kann die Fehlerwahrscheinlichkeit höher gewählt werden. D.h. es werden mehr Werte als bereits vorhanden gewertet und es muss ein neuer Wert berechnet werden. Dauert die Berechnung des neuen Wertes allerdings sehr lange, ist es sinnvoll mit einer sehr kleinen Fehlerwahrscheinlichkeit zu arbeiten, was den Filter allerdings auch langsamer macht. In unserem Fall haben wir uns für eine Fehlerwahrscheinlichkeit von etwa einem Prozent entschieden. Nachfolgend die endgültige Ausgabe.
+\newline
+\newline
+\includegraphics{last.jpg}
 
 \end{document}
