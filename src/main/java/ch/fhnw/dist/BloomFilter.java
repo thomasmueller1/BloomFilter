@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
  * Thomas Müller
  */
 public class BloomFilter {
-    int n;                            // Anzahl Wörter in Wordlist
+    int n;                            // Anzahl Wörter in Wortliste
     int k;                            // Anzahl Hashfunktionen
     int m;                            // Länge des Bitarrays
     double p;                         // Fehlerwahrscheinlichkeit
@@ -87,6 +87,17 @@ public class BloomFilter {
     }
 
     /**
+     * Macht Ausgaben der Parameter des BloomFilters
+     */
+    private void printParams() {
+        System.out.println("Parameter BloomFilter");
+        System.out.println("n (Anzahl Wörter in Wortliste):           " + n);
+        System.out.println("m (Länge des Bitarrays):                  " + m);
+        System.out.println("k (Anzahl Hashfunktionen):                " + k);
+        System.out.println("p (Gegebene Fehlerwahrscheinlichkeit):    " + p*100 + "%");
+    }
+
+    /**
      * Prüft ob ein Wort in der BloomFilter-Datenstruktur enthalten ist oder nicht.
      * Wenn false -> stimmt zu 100%
      * Wenn true -> stimmt nur mit einer gewissen Wahrscheinlichkeit
@@ -103,7 +114,7 @@ public class BloomFilter {
 
     /**
      * Prüft mehrere Wörter ob sie in der BloomFilter-Datenstruktur enthalten sind oder nicht.
-     * Macht Ausgaben von Parametern der überprüften Wörter und des eigentlichen BloomFilters.
+     * Macht Ausgaben von Parametern der überprüften Wörter.
      * @param wordlist Zu prüfende Wortliste
      */
     public void checkMultipleWords(String wordlist) {
@@ -117,9 +128,9 @@ public class BloomFilter {
 
         double pCalc = amountOfTrue / (notExistingWords.size() * 0.01);
 
-        System.out.println("Non existing words:     " + notExistingWords.size());
-        System.out.println("Matches in BloomFilter: " + amountOfTrue);
-        System.out.println("Calculated Error Rate:  " + new DecimalFormat("#.##").format(pCalc) + "%");
+        System.out.println("Anzahl nicht enthaltene Wörter:           " + notExistingWords.size());
+        System.out.println("Anzahl Treffer in BloomFilter:            " + amountOfTrue);
+        System.out.println("Experimentelle Fehlerwahrscheinlichkeit:  " + new DecimalFormat("#.##").format(pCalc) + "%");
     }
 
     /**
@@ -127,11 +138,10 @@ public class BloomFilter {
      * @param args
      */
     public static void main(String[] args) {
-        BloomFilter bloomFilter1 = new BloomFilter(0.05);
-        BloomFilter bloomFilter2 = new BloomFilter(0.005);
+        BloomFilter bloomFilter = new BloomFilter(0.005);
 
-        bloomFilter1.checkMultipleWords("notExistingWords.txt");
-        System.out.println("------------------------------");
-        bloomFilter2.checkMultipleWords("notExistingWords.txt");
+        bloomFilter.printParams();
+        System.out.println("-----------------------------------------------");
+        bloomFilter.checkMultipleWords("notExistingWords.txt");
     }
 }
