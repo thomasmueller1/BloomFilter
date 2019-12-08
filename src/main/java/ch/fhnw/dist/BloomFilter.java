@@ -4,10 +4,10 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Scanner;
 
 public class BloomFilter {
 
@@ -70,24 +70,25 @@ public class BloomFilter {
     public void checkMultipleWords() {
         String notExistingWordsPath = BloomFilter.class.getClassLoader().getResource("notExistingWords.txt").getPath();
         List<String> notExistingWords = getWordsFromFile(notExistingWordsPath);
-        String existingWordsPath = BloomFilter.class.getClassLoader().getResource("words.txt").getPath();
-        List<String> existingWords = getWordsFromFile(existingWordsPath);
-        int amountOfWordsInBothInputs = 0;
         int amountOfTrue = 0;
         for (String word : notExistingWords) {
             if (contains(word))
                 amountOfTrue++;
-            if (existingWords.contains(word))
-                amountOfWordsInBothInputs++;
         }
+        double p = amountOfTrue / (notExistingWords.size() * 0.01);
+
         System.out.println("Amount of not existing words: " + notExistingWords.size());
-        System.out.println("Amount of trues: " + amountOfTrue);
-        System.out.println("Amount of words in both: " + amountOfWordsInBothInputs);
-        System.out.println("(" + amountOfTrue + " - " + amountOfWordsInBothInputs + ")" + "/" + notExistingWords.size() * 0.01 + " = " + (amountOfTrue - amountOfWordsInBothInputs) / (notExistingWords.size() * 0.01) + "%");
+        System.out.println("Amount of matches:            " + amountOfTrue);
+        System.out.println("Fehlerwahrscheinlichkeit:     " + new DecimalFormat("#.##").format(p) + "%");
     }
 
     public static void main(String[] args) {
-        BloomFilter bloomFilter = new BloomFilter(0.0023);
-        bloomFilter.checkMultipleWords();
+        BloomFilter bloomFilter2 = new BloomFilter(0.05);
+        bloomFilter2.checkMultipleWords();
+
+        System.out.println("-------------------------------------");
+
+        BloomFilter bloomFilter3 = new BloomFilter(0.005);
+        bloomFilter3.checkMultipleWords();
     }
 }
