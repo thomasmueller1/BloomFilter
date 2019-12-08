@@ -138,7 +138,7 @@ public class BloomFilter {
      * @param args
      */
     public static void main(String[] args) {
-        BloomFilter bloomFilter = new BloomFilter(0.005);
+        BloomFilter bloomFilter = new BloomFilter(0.001);
 
         bloomFilter.printParams();
         System.out.println("-----------------------------------------------");
